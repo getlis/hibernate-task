@@ -22,11 +22,6 @@ public class User {
 
     }
 
-    @Override
-    public String toString() {
-        return this.name + " " + this.lastName;
-    }
-
     public User(String name, String lastName, Byte age) {
         this.name = name;
         this.lastName = lastName;
@@ -64,4 +59,10 @@ public class User {
     public void setAge(Byte age) {
         this.age = age;
     }
+
+    @Override
+    public String toString() {
+        return this.name + " " + this.lastName;
+    }
+
 }
