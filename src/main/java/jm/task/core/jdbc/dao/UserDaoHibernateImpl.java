@@ -24,8 +24,6 @@ public class UserDaoHibernateImpl implements UserDao {
 			throw new RuntimeException(e);
 		}
 		this.users = new ArrayList<>();
-
-
     }
 
 
@@ -46,7 +44,6 @@ public class UserDaoHibernateImpl implements UserDao {
 			session.createSQLQuery( qrySql ).executeUpdate();
 			session.getTransaction().commit();
 		}
-
 	}
 
     @Override
