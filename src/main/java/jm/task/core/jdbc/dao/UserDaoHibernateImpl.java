@@ -29,9 +29,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-
 		// Использовать SQl, а не HQL
-
 		String qrySql = "CREATE TABLE IF NOT EXISTS users (" +
 				"id BIGINT PRIMARY KEY AUTO_INCREMENT," +
 				"name VARCHAR(256) NOT NULL," +
@@ -49,7 +47,6 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
 		// Использовать SQl, а не HQL
-
 		String qrySql = "DROP TABLE IF EXISTS users;";
 
 		try ( Session session = sessionFactory.openSession() ) {
@@ -92,7 +89,6 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
 		// Использовать SQl, а не HQL
-
 		String qrySql = "TRUNCATE TABLE users;";
 
 		try ( Session session = sessionFactory.openSession() ) {
