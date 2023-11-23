@@ -4,14 +4,13 @@ import jm.task.core.jdbc.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.Transaction;
 
 public class UserDaoHibernateImpl implements UserDao {
 
 	private final SessionFactory sessionFactory;
-	private final List<User> users;
 
 	public UserDaoHibernateImpl() {
 
@@ -21,7 +20,6 @@ public class UserDaoHibernateImpl implements UserDao {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		this.users = new ArrayList<>();
 	}
 
 
@@ -34,16 +32,17 @@ public class UserDaoHibernateImpl implements UserDao {
 				"age TINYINT NOT NULL" +
 				")";
 
+		Transaction tx = null;
+
 		try ( Session session = sessionFactory.openSession() ) {
-			session.beginTransaction();
+			tx = session.beginTransaction();
+			session.createSQLQuery( qrySql ).executeUpdate();
+			tx.commit();
 
-			try{
-				session.createSQLQuery( qrySql ).executeUpdate();
-				session.getTransaction().commit();
-			} catch ( RuntimeException ex ) {
-				session.getTransaction().rollback();
+		} catch ( Exception e ) {
+			if (tx != null) {
+				tx.rollback();
 			}
-
 		}
 	}
 
@@ -51,56 +50,59 @@ public class UserDaoHibernateImpl implements UserDao {
 	public void dropUsersTable() {
 		String qrySql = "DROP TABLE IF EXISTS users;";
 
-		try ( Session session = sessionFactory.openSession() ) {
-			session.beginTransaction();
+		Transaction tx = null;
 
-			try{
-				session.createSQLQuery( qrySql ).executeUpdate();
-				session.getTransaction().commit();
-			} catch ( RuntimeException ex ) {
-				session.getTransaction().rollback();
+		try ( Session session = sessionFactory.openSession() ) {
+			tx = session.beginTransaction();
+			session.createSQLQuery( qrySql ).executeUpdate();
+			tx.commit();
+
+		} catch ( Exception e ) {
+			if (tx != null) {
+				tx.rollback();
 			}
 		}
 	}
 
 	@Override
 	public void saveUser(String name, String lastName, byte age) {
+		Transaction tx = null;
 
 		try ( Session session = sessionFactory.openSession() ) {
-			session.beginTransaction();
+			tx = session.beginTransaction();
+			session.save( new User( name, lastName, age) );
+			tx.commit();
 
-			try{
-				session.save( new User( name, lastName, age) );
-				session.getTransaction().commit();
-			} catch ( RuntimeException ex ) {
-				session.getTransaction().rollback();
+		} catch ( Exception e ) {
+			if (tx != null) {
+				tx.rollback();
 			}
 		}
 	}
 
 	@Override
 	public void removeUserById(long id) {
+		Transaction tx = null;
 
 		try ( Session session = sessionFactory.openSession() ) {
-			session.beginTransaction();
+			tx = session.beginTransaction();
+			User user = session.get(User.class, id);
+			session.delete(user);
+			tx.commit();
 
-			try{
-				User user = session.get(User.class, id);
-				session.delete(user);
-				session.getTransaction().commit();
-			} catch ( RuntimeException ex ) {
-				session.getTransaction().rollback();
+		} catch ( Exception e ) {
+			if (tx != null) {
+				tx.rollback();
 			}
 		}
 	}
 
 	@Override
 	public List<User> getAllUsers() {
-
 		String hql = "FROM User";
 
 		try (Session session = sessionFactory.openSession()) {
-			return session.createQuery(hql, User.class).getResultList();
+			return  session.createQuery(hql, User.class).getResultList();
 		}
 	}
 
@@ -108,14 +110,16 @@ public class UserDaoHibernateImpl implements UserDao {
 	public void cleanUsersTable() {
 		String qrySql = "TRUNCATE TABLE users;";
 
-		try ( Session session = sessionFactory.openSession() ) {
-			session.beginTransaction();
+		Transaction tx = null;
 
-			try{
-				session.createSQLQuery( qrySql ).executeUpdate();
-				session.getTransaction().commit();
-			} catch ( RuntimeException ex ) {
-				session.getTransaction().rollback();
+		try ( Session session = sessionFactory.openSession() ) {
+			tx = session.beginTransaction();
+			session.createSQLQuery( qrySql ).executeUpdate();
+			tx.commit();
+
+		} catch ( Exception e ) {
+			if (tx != null) {
+				tx.rollback();
 			}
 		}
 	}
